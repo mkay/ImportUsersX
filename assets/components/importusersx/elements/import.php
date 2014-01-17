@@ -62,15 +62,16 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 	
 	//$sLog = $modx->lexicon('importusersx');
 
+    // ======================================
+    // = .csv format:
+    // = username;name;email = 
+    // ===================================== 
+
 	while(($data = fgetcsv($csv, 1000, ";")) !== FALSE)
 	{
-		$sFirstName	= htmlentities(trim($data[0]));
-		$sLastName	= htmlentities(trim($data[1]));
-		$sEmail		= trim($data[2]);
-				
-		$aExplodeEmail = explode('@',$sEmail); 
-		$sAlias = $aExplodeEmail[0];//ModX username : mail - @domain.ext (ex: mail = login@domain.ext =>  username = login)
-		//$sAlias = trim($sEmail); //ModX username = mail
+		$sAlias = htmlentities(trim($data[0]));
+		$sName	= htmlentities(trim($data[1]));
+		$sEmail	= trim($data[2]);
 	
 		//Based on code from Bob Ray
 		$aFields = array(
@@ -91,7 +92,7 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 			$uid = $user->get('id');
 			if( $userProfile = $modx->getObject('modUserProfile',array('internalKey' => $uid)))
 			{
-				$userProfile->set('fullname', $sFirstName. ' ' .$sLastName);
+				$userProfile->set('fullname', $sName);
 				
 				$sChangeLog .= $sAlias."'s informations updated.\n";
 				$iChangeCount++;
@@ -119,7 +120,7 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 			$userProfile = $modx->newObject('modUserProfile');
 			$userProfile->fromArray(array(
 				'internalKey' => $uid,
-				'fullname'    => $sFirstName.' '.$sLastName,
+				'fullname'    => $sName,
 				'email'       => $sEmail,
 			));
 						
@@ -140,11 +141,11 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 						'alias'    => $sAlias,
 						'password' => $sPass,
 						'sname' =>  $modx->getOption('site_name'),
-						'surl' => $modx->getOption('url_scheme') . $modx->getOption('http_host')// . $modx->getOption('manager_url'),
+						'surl' => $modx->getOption('url_scheme') . $modx->getOption('http_host')
 					)
 				);
 				
-				$user->sendEmail($sMessage);
+/* 				$user->sendEmail($sMessage); */
 			} 
 			else 
 			{
@@ -153,6 +154,7 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 		}
 	}
 	
+/*
 	$user = $modx->getObject('modUser', array('username'=>$sAdminUsername));
 		
 	$sMessageAdmin = $modx->getChunk($sEmailAdminChunkName, 
@@ -163,7 +165,9 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
 			'changeLog'   => $sChangeLog,
 		)
 	);
+*/
 		
+/*
 	$modx->getService('mail', 'mail.modPHPMailer');
 	$modx->mail->set(modMail::MAIL_BODY, $sMessageAdmin);
 	$modx->mail->set(modMail::MAIL_FROM, $modx->config['emailsender']);
@@ -176,6 +180,7 @@ if (($csv = fopen($sCSVPath,'r')) != FALSE) {
     $modx->log(modX::LOG_LEVEL_ERROR,'An error occurred while trying to send the email: '.$modx->mail->mailer->ErrorInfo);
 	}
 	$modx->mail->reset();
+*/
 		
 	fclose($csv);
 	
